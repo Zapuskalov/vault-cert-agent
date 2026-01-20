@@ -15,9 +15,9 @@ type Meta struct {
 	Expiration int64 `json:"expiration"`
 }
 
-func writeFile(dir, name, content string) {
+func writeFile(dir, name, content string, perm os.FileMode) {
 	path := filepath.Join(dir, name)
-	if err := os.WriteFile(path, []byte(content), 0600); err != nil {
+	if err := os.WriteFile(path, []byte(content), perm); err != nil {
 		log.Printf("[%s] Error writing file %s: %v", dir, name, err)
 	}
 }
@@ -40,7 +40,7 @@ func IssueCert(c *api.Client, cfg Config) (bool, error) {
 		return false, err
 	}
 
-	if err := os.MkdirAll(cfg.Output.Dir, 0700); err != nil {
+	if err := os.MkdirAll(cfg.Output.Dir, 0755); err != nil {
 		return false, err
 	}
 
@@ -58,10 +58,10 @@ func IssueCert(c *api.Client, cfg Config) (bool, error) {
 		caChain = issuingCA
 	}
 
-	writeFile(cfg.Output.Dir, "cert.pem", serverCert)
-	writeFile(cfg.Output.Dir, "key.pem", privateKey)
-	writeFile(cfg.Output.Dir, "ca.pem", caChain)
-	writeFile(cfg.Output.Dir, "fullchain.pem", serverCert+"\n"+caChain)
+	writeFile(cfg.Output.Dir, "cert.pem", serverCert, 0644)
+	writeFile(cfg.Output.Dir, "key.pem", privateKey, 0600)
+	writeFile(cfg.Output.Dir, "ca.pem", caChain, 0644)
+	writeFile(cfg.Output.Dir, "fullchain.pem", serverCert+"\n"+caChain, 0644)
 
 	// --- expiration ---
 	var expInt int64
@@ -78,7 +78,7 @@ func IssueCert(c *api.Client, cfg Config) (bool, error) {
 
 	meta := Meta{Expiration: expInt}
 	metaBytes, _ := json.Marshal(meta)
-	writeFile(cfg.Output.Dir, "meta.json", string(metaBytes))
+	writeFile(cfg.Output.Dir, "meta.json", string(metaBytes), 0644)
 
 	log.Printf("[%s] Certificate issued, expires at: %s", cfg.Name, time.Unix(expInt, 0))
 	return true, nil
