@@ -63,7 +63,9 @@ daemon:
 
 hooks:
   post_issue:
-    - systemctl reload nginx
+    - cmd: "systemctl reload nginx"
+      run_after: "23:00"
+      run_before: "04:00"
 
 Supported environment variables (for Vault connection and authentication):
 
@@ -79,6 +81,7 @@ Supported environment variables (for Vault connection and authentication):
 Notes:
   • Only Vault connection and authentication can be configured via ENV.
   • PKI path, role, CN, output directory, TTL, and hooks must be set in the config file(s).
+  • Hooks support optional time windows using run_after/run_before in HH:MM format.
   • If using --config-dir, each YAML/JSON file is treated as a separate configuration.
 `,
 	Example: `  # Issue a certificate once using a single config file

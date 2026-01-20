@@ -92,7 +92,10 @@ daemon:
 
 hooks:
   post_issue:
-    - systemctl reload nginx
+    - cmd: "systemctl reload nginx"
+      run_after: "23:00"
+      run_before: "04:00"
+    - cmd: "echo 'Certificate renewed!' >> /var/log/cert-renew.log"
 ```
 
 ---

@@ -44,8 +44,14 @@ type DaemonConfig struct {
 	RenewBefore   string `mapstructure:"renew_before"`
 }
 
+type Hook struct {
+	Cmd       string `mapstructure:"cmd"`
+	RunAfter  string `mapstructure:"run_after"`  // HH:MM
+	RunBefore string `mapstructure:"run_before"` // HH:MM
+}
+
 type HooksConfig struct {
-	PostIssue []string `mapstructure:"post_issue"`
+	PostIssue []Hook `mapstructure:"post_issue"`
 }
 
 type Config struct {
